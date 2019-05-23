@@ -1,0 +1,145 @@
+" Comment the following line if you don't want Vim and NeoVim to share the
+" same plugin download directory.
+let g:spacevim_plug_home = '~/.vim/plugged'
+
+" Uncomment the following line to override the leader key. The default value is space key "<\Space>".
+" let g:spacevim_leader = "<\Space>"
+
+" Uncomment the following line to override the local leader key. The default value is comma ','.
+" let g:spacevim_localleader = ','
+
+" Enable the existing layers in space-vim.
+" Refer to https://github.com/liuchengxu/space-vim/blob/master/layers/LAYERS.md for all available layers.
+let g:spacevim_layers = [
+      \ 'fzf', 'better-defaults', 'which-key', 'c-c++', 'programming', 'code-snippets', 'editing', 'cscope', 'syntax-checking'
+      \ ]
+
+" Uncomment the following line if your terminal(-emulator) supports true colors.
+" let g:spacevim_enable_true_color = 1
+
+" Uncomment the following if you have some nerd font installed.
+" let g:spacevim_nerd_fonts = 1
+
+" If you want to have more control over the layer, try using Layer command.
+" if g:spacevim.gui
+"   Layer 'airline'
+" endif
+
+" Manage your own plugins.
+" Refer to https://github.com/junegunn/vim-plug for more detials.
+function! UserInit()
+  Plug 'vim-airline/vim-airline-themes'
+  Plug 'vim-airline/vim-airline'
+  Plug 'flazz/vim-colorschemes'
+  Plug 'junegunn/seoul256.vim'
+  Plug 'rust-lang/rust.vim'
+  Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+  Plug 'KabbAmine/zeavim.vim' " Documentation
+  Plug 'ctrlpvim/ctrlp.vim'
+  Plug 'ncm2/ncm2'
+  Plug 'roxma/nvim-yarp'
+  Plug 'lervag/vimtex'
+  Plug 'xuhdev/vim-latex-live-preview', { 'for': 'tex' }
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-speeddating'
+  Plug 'jceb/vim-orgmode'
+endfunction
+
+" Override the default settings from space-vim as well as adding extras
+function! UserConfig()
+  " Override the default settings.
+  " Uncomment the following line to disable relative number.
+  "set norelativenumber
+
+  " Adding extras.
+  " Uncomment the following line If you have installed the powerline fonts.
+  " It is good for airline layer.
+  " let g:airline_powerline_fonts = 1
+  
+  "set background=light
+  "colorscheme lightcolors
+  set nocursorline
+
+  let g:LanguageClient_serverCommands = {
+    \ 'rust': ['~/.cargo/bin/rustup', 'run', 'stable', 'rls'],
+    \ 'javascript': ['/usr/local/bin/javascript-typescript-stdio'],
+    \ 'javascript.jsx': ['tcp://127.0.0.1:2089'],
+    \ 'python': ['/usr/local/bin/pyls'],
+    \ }
+
+  nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+  " Or map each action separately
+  nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+  nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+  nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+  nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+
+  set undodir=~/.vimdid
+  set undofile
+
+  "Autocomplete beh
+  "
+  autocmd BufEnter * call ncm2#enable_for_buffer()
+  set completeopt=noinsert,menuone,noselect
+  
+  inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+  inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+  "Syntax
+  "
+  let g:ale_lint_on_text_changed = 'never'
+  let g:ale_lint_on_insert_leave = 1
+  let g:ale_lint_on_save = 0
+  let g:ale_lint_on_enter = 0
+  let g:ale_virtualtext_cursor = 1
+  let g:ale_rust_rls_config = {
+    \ 'rust': {
+      \ 'all_targets': 1,
+      \ 'build_on_save': 1,
+      \ 'clippy_preference': 'on'
+    \ }
+    \ }
+  let g:ale_rust_rls_toolchain = ''
+  let g:ale_linters = {'rust': ['rls']}
+  highlight link ALEWarningSign Todo
+  highlight link ALEErrorSign WarningMsg
+  highlight link ALEVirtualTextWarning Todo
+  highlight link ALEVirtualTextInfo Todo
+  highlight link ALEVirtualTextError WarningMsg
+  highlight ALEError guibg=None
+  highlight ALEWarning guibg=None
+  let g:ale_sign_error = "✖"
+  let g:ale_sign_warning = "⚠"
+  let g:ale_sign_info = "i"
+  let g:ale_sign_hint = "➤"
+
+  "Keys
+
+  nnoremap <up> <nop>
+  nnoremap <down> <nop>
+  inoremap <up> <nop>
+  inoremap <down> <nop>
+  inoremap <left> <nop>
+  inoremap <right> <nop>
+
+  nnoremap <left> :bp<CR>
+  nnoremap <right> :bn<CR>
+  nnoremap ü :e .<CR>
+  inoremap jk <ESC>
+
+  map H ^
+  map L $
+
+  nnoremap ; :Files<CR>
+  nnoremap ,. :Buffers<CR>
+
+  autocmd InsertLeave * set nopaste
+
+  "nnoremap ; :CtrlPBuffer<CR>
+  "nnoremap <C-T> :CtrlPTag<CR>
+
+endfunction
